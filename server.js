@@ -1,8 +1,23 @@
 const express = require('express');
 const nunjucks = require('nunjucks');
 const app = express();
+const routes = require('./routes');
+const session = require('express-session');
+const flash = require('connect-flash');
 
-app.listen(3000, () => console.log('Servidor en puerto 3000'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(flash());
+
+app.use(
+  session({
+    secret: 'mi-clave',
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 1000 * 24 }, // 1 día
+    resave: false,
+  })
+);
 
 nunjucks.configure('views', {
   express: app,
@@ -11,9 +26,6 @@ nunjucks.configure('views', {
   watch: true,
 });
 
-//renderiza las pagina
-app.get('/:page', (req, res) => {
-  let page = req.params.page.toLocaleLowerCase();
-  page = page.charAt(0).toUpperCase() + page.slice(1);
-  res.render(`${page}.html`);
-});
+app.use('/', routes);
+
+app.listen(3000, () => console.log('Servidor en puerto 3000'));
