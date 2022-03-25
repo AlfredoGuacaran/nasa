@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { postUser, getUser, getUsers } = require('./db.js');
+const { postUser, getUser, getUsers, putUser } = require('./db.js');
 
 router.get('/admin', async (req, res) => {
   try {
@@ -111,6 +111,26 @@ router.post('/login', async (req, res) => {
     console.log(error);
     req.flash('errors', error.message);
     res.redirect('/login');
+  }
+});
+
+router.put('/admin', async (req, res) => {
+  try {
+    const { id, auth } = req.body;
+
+    const updateUser = await putUser(id, auth);
+
+    if (!updateUser.ok) {
+      req.flash('errors', updateUser.error);
+      return res.redirect('/admin');
+    }
+
+    req.flash('success', 'Usuario actualizado con exito');
+    res.send();
+  } catch (error) {
+    console.log(error);
+    req.flash('errors', error.message);
+    res.redirect('/admin');
   }
 });
 

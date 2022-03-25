@@ -46,6 +46,22 @@ async function postUser(name, email, password) {
   }
 }
 
+async function putUser(id, auth) {
+  try {
+    const client = await pool.connect();
+    const res = await client.query({
+      text: 'update users set auth =$2 where id=$1',
+      values: [id, auth],
+    });
+    client.release();
+    return res.rowCount
+      ? { ok: true }
+      : { ok: false, error: 'usuario actualizado con exito' };
+  } catch (error) {
+    return { ok: false, error: 'usuario actualizado con exito' };
+  }
+}
+
 async function getUser(email) {
   try {
     const client = await pool.connect();
@@ -76,4 +92,4 @@ async function getUsers() {
     return { ok: false, error: 'Error al obtener usuarios' };
   }
 }
-module.exports = { postUser, getUser, getUsers };
+module.exports = { postUser, getUser, getUsers, putUser };
