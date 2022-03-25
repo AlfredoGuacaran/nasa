@@ -62,4 +62,18 @@ async function getUser(email) {
   }
 }
 
-module.exports = { postUser, getUser };
+async function getUsers() {
+  try {
+    const client = await pool.connect();
+    const res = await client.query({
+      text: 'select * from users',
+    });
+    client.release();
+    return res.rows[0]
+      ? { ok: true, data: res.rows }
+      : { ok: false, error: 'Error al obtener usuarios' };
+  } catch (error) {
+    return { ok: false, error: 'Error al obtener usuarios' };
+  }
+}
+module.exports = { postUser, getUser, getUsers };

@@ -1,11 +1,68 @@
 const express = require('express');
 const router = express.Router();
-const { renderHTML } = require('./helpersFunctions.js');
-const { postUser, getUser } = require('./db.js');
-const req = require('express/lib/request');
+const { postUser, getUser, getUsers } = require('./db.js');
 
-router.get('/:page', renderHTML);
-router.get('/', renderHTML);
+router.get('/admin', async (req, res) => {
+  try {
+    const errors = req.flash('errors');
+    const success = req.flash('success');
+    const user = req.session.user;
+    const users = await getUsers();
+
+    if (!users.ok) {
+      req.flash('errors', 'Error al obtener usuarios');
+      return res.redirect('/admin');
+    }
+    const usersData = users.data;
+    res.render('Admin.html', { errors, success, user, usersData });
+  } catch (error) {
+    console.log(error);
+    res.redirect('/admin');
+  }
+});
+
+router.get('/evidencias', async (req, res) => {
+  try {
+    const errors = req.flash('errors');
+    const success = req.flash('success');
+    const user = req.session.user;
+    res.render('Evidencias.html', { errors, success, user });
+  } catch (error) {
+    console.log(error);
+    res.redirect('/evidencias');
+  }
+});
+
+router.get('/login', async (req, res) => {
+  try {
+    const errors = req.flash('errors');
+    const success = req.flash('success');
+    res.render('Login.html', { errors, success });
+  } catch (error) {
+    console.log(error);
+    res.redirect('/login');
+  }
+});
+
+router.get('/signin', async (req, res) => {
+  try {
+    const errors = req.flash('errors');
+    const success = req.flash('success');
+    res.render('Signin.html', { errors, success });
+  } catch (error) {
+    console.log(error);
+    res.redirect('/signin');
+  }
+});
+
+router.get('/', async (req, res) => {
+  try {
+    res.redirect('/signin');
+  } catch (error) {
+    console.log(error);
+    res.redirect('/signin');
+  }
+});
 
 router.post('/signin', async (req, res) => {
   try {
